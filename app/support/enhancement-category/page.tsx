@@ -1,24 +1,26 @@
-'use client';
+/**
+ * Enhancement Category Page - Refactored
+ */
 
-import { SupportPanelCard } from "@/components/help-center/SupportPanelCard";
-import { Plus, Bug } from "lucide-react";
+import { SupportPanelCard } from '@/features/help-center';
 
 export default function EnhancementCategoryPage() {
   const options = [
     {
-      title: "New Feature Request / System Changes or Enhancement",
+      title: 'New Feature Request / System Changes or Enhancement',
       description:
         "Request for something that doesn't exist yet or suggest modifications to existing features.",
-      iconSrc: "develop.png",
-      href: "https://docs.google.com/forms/d/e/1FAIpQLScJMtQh8XlU68V6nJJA2qcB7x2C7-cQpdLF2BRr5r8QSxs0bg/viewform?usp=dialog",
-      iconColor: "bg-green-500",
+      iconSrc: 'develop.png',
+      href: 'https://docs.google.com/forms/d/e/1FAIpQLScJMtQh8XlU68V6nJJA2qcB7x2C7-cQpdLF2BRr5r8QSxs0bg/viewform?usp=dialog',
+      iconColor: 'bg-green-500',
     },
     {
-      title: "Bug Report",
-      description: "Something that was working before is now broken or misbehaving.",
-      iconSrc: "bug-report.png",
-      href: "https://docs.google.com/forms/d/e/1FAIpQLScJMtQh8XlU68V6nJJA2qcB7x2C7-cQpdLF2BRr5r8QSxs0bg/viewform?usp=dialog",
-      iconColor: "bg-red-500",
+      title: 'Bug Report',
+      description:
+        'Something that was working before is now broken or misbehaving.',
+      iconSrc: 'bug-report.png',
+      href: 'https://docs.google.com/forms/d/e/1FAIpQLScJMtQh8XlU68V6nJJA2qcB7x2C7-cQpdLF2BRr5r8QSxs0bg/viewform?usp=dialog',
+      iconColor: 'bg-red-500',
     },
   ];
 

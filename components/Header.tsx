@@ -1,6 +1,13 @@
-import Link from "next/link";
-import { Home } from "lucide-react";
-import ThemeToggle from "@/components/ui/ThemeToggle";
+import Link from 'next/link';
+import { Home } from 'lucide-react';
+import { IMAGES } from '@/shared/constants';
+import dynamic from 'next/dynamic';
+
+// Lazy load ThemeToggle since it's interactive
+const ThemeToggle = dynamic(() => import('@/components/ui/ThemeToggle'), {
+  ssr: false,
+  loading: () => <div className="h-10 w-10" />,
+});
 
 export default function Header() {
   return (
@@ -8,12 +15,20 @@ export default function Header() {
       <div className="max-w-7xl mx-auto px-6">
         <div className="h-16 flex items-center justify-between">
           <Link href="/">
-            <img src="/images/shipskart-logo.png" alt="Shipskart" className="h-10 w-auto" />
+            <img
+              src={IMAGES.LOGO}
+              alt="Shipskart"
+              className="h-10 w-auto"
+            />
           </Link>
 
           <div className="flex items-center space-x-3">
             <ThemeToggle />
-            <Link href="/" aria-label="Home" className="inline-flex items-center justify-center h-10 w-10 rounded-md text-gray-600 hover:bg-gray-100">
+            <Link
+              href="/"
+              aria-label="Home"
+              className="inline-flex items-center justify-center h-10 w-10 rounded-md text-gray-600 hover:bg-gray-100"
+            >
               <Home className="h-5 w-5" />
             </Link>
           </div>

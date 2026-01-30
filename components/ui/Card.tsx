@@ -1,3 +1,5 @@
+"use client";
+
 import * as React from "react";
 import { cn } from "@/shared/utils";
 
@@ -75,4 +77,41 @@ const CardFooter = React.forwardRef<
 ));
 CardFooter.displayName = "CardFooter";
 
-export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent };
+// Reusable Support Card Component
+interface SupportCardProps {
+  title: string;
+  description: string;
+  icon: React.ReactNode;
+  onClick?: () => void;
+  className?: string;
+}
+
+const SupportCard = React.forwardRef<HTMLDivElement, SupportCardProps>(
+  ({ title, description, icon, onClick, className }, ref) => (
+    <div
+      ref={ref}
+      onClick={onClick}
+      className={cn(
+        "bg-white rounded-lg shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 p-6 cursor-pointer group animate-in fade-in slide-in-from-bottom-4 duration-500",
+        className
+      )}
+    >
+      <div className="flex items-start gap-5">
+        <div className="flex-shrink-0 w-16 h-16 flex items-center justify-center rounded-lg bg-blue-50 group-hover:bg-blue-100 transition-colors duration-200">
+          {icon}
+        </div>
+        <div className="flex-1 min-w-0 py-1">
+          <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-blue-700 transition-colors duration-200">
+            {title}
+          </h3>
+          <p className="text-sm text-gray-600 leading-relaxed">
+            {description}
+          </p>
+        </div>
+      </div>
+    </div>
+  )
+);
+SupportCard.displayName = "SupportCard";
+
+export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent, SupportCard };

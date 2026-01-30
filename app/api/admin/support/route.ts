@@ -1,51 +1,73 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from 'next/server';
+import type { SupportTicket } from '@/shared/types';
 
+/**
+ * MOCK API ROUTE - Replace with real database integration
+ * 
+ * This is a temporary mock implementation replacing Google Sheets integration.
+ * For production, integrate with:
+ * - PostgreSQL + Prisma
+ * - MongoDB + Mongoose
+ * - Supabase
+ * - Firebase
+ */
+
+// Mock data store (in-memory) - will reset on server restart
+let mockTickets: SupportTicket[] = [
+  {
+    ticketId: 'DEMO-001',
+    timestamp: new Date().toISOString(),
+    requestType: 'IT Admin / Data Correction Requests',
+    summary: 'Demo Ticket - Update user permissions',
+    description: 'Please update access permissions for the new team member.',
+    priority: 'High',
+    status: 'Open',
+    approvedBy: '',
+    approvedAt: '',
+  },
+  {
+    ticketId: 'DEMO-002',
+    timestamp: new Date(Date.now() - 86400000).toISOString(),
+    requestType: 'Change / Enhancement Request',
+    summary: 'Demo Ticket - Add new dashboard filter',
+    description: 'Request to add date range filter to the analytics dashboard.',
+    priority: 'Medium',
+    status: 'In Progress',
+    approvedBy: 'Admin User',
+    approvedAt: new Date(Date.now() - 43200000).toISOString(),
+  },
+  {
+    ticketId: 'DEMO-003',
+    timestamp: new Date(Date.now() - 172800000).toISOString(),
+    requestType: 'Bug Report',
+    summary: 'Demo Ticket - Fix login issue',
+    description: 'Users reporting login failures on mobile devices.',
+    priority: 'Critical',
+    status: 'Done',
+    approvedBy: 'Admin User',
+    approvedAt: new Date(Date.now() - 86400000).toISOString(),
+  },
+];
+
+/**
+ * GET /api/admin/support
+ * Fetch all support tickets
+ */
 export async function GET(request: NextRequest) {
   try {
-    const scriptUrl = process.env.GOOGLE_APPS_SCRIPT_URL;
-    if (!scriptUrl) {
-      throw new Error("GOOGLE_APPS_SCRIPT_URL is not configured");
-    }
-
-    // Call Google Apps Script to fetch all tickets
-    const response = await fetch(`${scriptUrl}?action=getTickets`, {
-      method: "GET",
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch tickets from Google Apps Script");
-    }
-
-    const data = await response.json();
-
-    // Map sheet-returned tickets (keys are sheet headers) into internal SupportTicket shape
-    const rawTickets: any[] = data.tickets || [];
-    const tickets = rawTickets.map((t: any) => ({
-      ticketId: t['ID'] || t.ID || t['id'] || '',
-      timestamp: t['Created On'] || t['CreatedOn'] || t.timestamp || '',
-      requestType: t['Type of Request'] || t['Request Type'] || '',
-      summary: t['Summary'] || '',
-      description: t['Request Details'] || t['Request'] || '',
-      exactChange: t['Exact Change Needed'] || '',
-      additionalEmails: t['Additional Emails'] || '',
-      priority: t['Priority'] || 'Medium',
-      impact: t['Impact on Work'] || '',
-      attachmentLinks: t['Attachments'] || '',
-      status: t['Status'] || 'Open',
-      approvedBy: t['ApprovedBy'] || '',
-      approvedAt: t['ApprovedAt'] || ''
-    }));
+    // Simulate network delay
+    await new Promise((resolve) => setTimeout(resolve, 300));
 
     return NextResponse.json({
       success: true,
-      tickets,
+      tickets: mockTickets,
     });
   } catch (error) {
-    console.error("Error fetching tickets:", error);
+    console.error('Error fetching tickets:', error);
     return NextResponse.json(
       {
         success: false,
-        error: error instanceof Error ? error.message : "Internal server error",
+        error: error instanceof Error ? error.message : 'Internal server error',
         tickets: [],
       },
       { status: 500 }
@@ -53,6 +75,10 @@ export async function GET(request: NextRequest) {
   }
 }
 
+/**
+ * PATCH /api/admin/support
+ * Update ticket status
+ */
 export async function PATCH(request: NextRequest) {
   try {
     const body = await request.json();
@@ -60,49 +86,77 @@ export async function PATCH(request: NextRequest) {
 
     if (!ticketId || !status) {
       return NextResponse.json(
-        { success: false, error: "ticketId and status are required" },
+        { success: false, error: 'ticketId and status are required' },
         { status: 400 }
       );
     }
 
-    const scriptUrl = process.env.GOOGLE_APPS_SCRIPT_URL;
-    if (!scriptUrl) {
-      throw new Error("GOOGLE_APPS_SCRIPT_URL is not configured");
+    // Find and update the ticket
+    const ticketIndex = mockTickets.findIndex((t) => t.ticketId === ticketId);
+    
+    if (ticketIndex === -1) {
+      return NextResponse.json(
+        { success: false, error: 'Ticket not found' },
+        { status: 404 }
+      );
     }
 
-    // Call Google Apps Script to update ticket
-    const response = await fetch(scriptUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        action: "updateTicket",
-        ticketId,
-        status,
-        approvedBy,
-        approvedAt: new Date().toISOString(),
-        remarks,
-      }),
-    });
+    // Update ticket
+    mockTickets[ticketIndex] = {
+      ...mockTickets[ticketIndex],
+      status,
+      approvedBy: approvedBy || mockTickets[ticketIndex].approvedBy,
+      approvedAt: new Date().toISOString(),
+    };
 
-    if (!response.ok) {
-      throw new Error("Failed to update ticket in Google Apps Script");
-    }
-
-    const result = await response.json();
+    // Simulate network delay
+    await new Promise((resolve) => setTimeout(resolve, 300));
 
     return NextResponse.json({
       success: true,
-      message: "Ticket updated successfully",
-      ...result,
+      message: 'Ticket updated successfully',
+      ticket: mockTickets[ticketIndex],
     });
   } catch (error) {
-    console.error("Error updating ticket:", error);
+    console.error('Error updating ticket:', error);
     return NextResponse.json(
       {
         success: false,
-        error: error instanceof Error ? error.message : "Internal server error",
+        error: error instanceof Error ? error.message : 'Internal server error',
+      },
+      { status: 500 }
+    );
+  }
+}
+
+/**
+ * POST /api/admin/support
+ * Create new ticket (optional - for future use)
+ */
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    
+    const newTicket: SupportTicket = {
+      ticketId: `TICKET-${Date.now()}`,
+      timestamp: new Date().toISOString(),
+      ...body,
+      status: body.status || 'Open',
+    };
+
+    mockTickets.unshift(newTicket);
+
+    return NextResponse.json({
+      success: true,
+      message: 'Ticket created successfully',
+      ticket: newTicket,
+    });
+  } catch (error) {
+    console.error('Error creating ticket:', error);
+    return NextResponse.json(
+      {
+        success: false,
+        error: error instanceof Error ? error.message : 'Internal server error',
       },
       { status: 500 }
     );
